@@ -1,14 +1,19 @@
 const nodemailer = require("nodemailer");
+const dns = require("dns"); // Importamos el módulo nativo de DNS
 require("dotenv").config();
 
 const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 465,
-    secure: true, // Deja esto en true para puerto 465
+    secure: true,
     
-    // ESTA LÍNEA ES CLAVE EN RENDER:
-    // Obliga a Node a resolver la IP usando el comportamiento nativo del sistema operativo
-    connectionTimeout: 10000, // 10 segundos de límite para no congelar el servidor
+    // FORZAR IPV4 EN RENDER:
+    // Esta función obliga a resolver el host usando solo la familia 4 (IPv4)
+    dnsLookup: (hostname, options, callback) => {
+        dns.lookup(hostname, { family: 4 }, callback);
+    },
+
+    connectionTimeout: 10000,
     greetingTimeout: 10000,
     
     auth: {
