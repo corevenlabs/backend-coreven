@@ -1,31 +1,23 @@
+const nodemailer = require("nodemailer");
+require("dotenv").config();
 
-const transporter = require("../config/mailer")
-
-
-const sendEmail = async (req, res, next) => {
-    try {
-
-        const {nombre, email, mensaje} = req.body
-
-        const mailOptions = {
-            from : "corevenlabs@gmail.com",
-            to : "corevenlabs@gmail.com",
-            text :  `
-            Nombre: ${nombre}
-            Email: ${email}
-            Mensaje: ${mensaje}
-        `
-        };
-
-        await transporter.sendMail(mailOptions)
-
-        res.status(200).json({
-            message : "Correo enviado exitosamente"
-        })
-        
-    } catch (error) {
-        next(error)
+const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true, // Deja esto en true para puerto 465
+    
+    // ESTA LÍNEA ES CLAVE EN RENDER:
+    // Obliga a Node a resolver la IP usando el comportamiento nativo del sistema operativo
+    connectionTimeout: 10000, // 10 segundos de límite para no congelar el servidor
+    greetingTimeout: 10000,
+    
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    },
+    tls: {
+        rejectUnauthorized: false
     }
-}
+});
 
-module.exports = sendEmail
+module.exports = transporter;
