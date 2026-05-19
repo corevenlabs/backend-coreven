@@ -7,7 +7,7 @@ const emailRoutes = require("./routes/email")
 const manejadorErrores = require("./middleware/menjadorErrores")
 
 const app = express()
-app.use(cors());
+app.use(cors({origin: "https://www.corevenlabs.com"}));
 app.use(express.json())
 
 app.use("/email", emailRoutes)
