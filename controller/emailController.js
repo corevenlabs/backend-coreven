@@ -1,31 +1,43 @@
+const { Resend } = require("resend");
 
-const transporter = require("../config/mailer")
-
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendEmail = async (req, res, next) => {
+
     try {
 
-        const {nombre, email, mensaje} = req.body
+        const { nombre, email, mensaje } = req.body;
 
-        const mailOptions = {
-            from : "corevenlabs@gmail.com",
-            to : "corevenlabs@gmail.com",
-            text :  `
-            Nombre: ${nombre}
-            Email: ${email}
-            Mensaje: ${mensaje}
-        `
-        };
+        const data = await resend.emails.send({
 
-        await transporter.sendMail(mailOptions)
+            from: "onboarding@resend.dev",
+
+            to: "corevenlabs@gmail.com",
+
+            subject: "Nuevo mensaje de contacto",
+
+            html: `
+                <h2>Nuevo mensaje</h2>
+
+                <p><strong>Nombre:</strong> ${nombre}</p>
+
+                <p><strong>Email:</strong> ${email}</p>
+
+                <p><strong>Mensaje:</strong> ${mensaje}</p>
+            `
+        });
 
         res.status(200).json({
-            message : "Correo enviado exitosamente"
-        })
-        
-    } catch (error) {
-        next(error)
-    }
-}
+            ok: true,
+            data
+        });
 
-module.exports = sendEmail
+    } catch (error) {
+
+        console.log(error);
+
+        next(error);
+    }
+};
+
+module.exports = sendEmail;
