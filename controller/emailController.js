@@ -1,28 +1,31 @@
-const nodemailer = require("nodemailer");
-const dns = require("dns"); // Importamos el módulo nativo de DNS
-require("dotenv").config();
 
-const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    
-    // FORZAR IPV4 EN RENDER:
-    // Esta función obliga a resolver el host usando solo la familia 4 (IPv4)
-    dnsLookup: (hostname, options, callback) => {
-        dns.lookup(hostname, { family: 4 }, callback);
-    },
+const transporter = require("../config/mailer")
 
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    },
-    tls: {
-        rejectUnauthorized: false
+
+const sendEmail = async (req, res, next) => {
+    try {
+
+        const {nombre, email, mensaje} = req.body
+
+        const mailOptions = {
+            from : "corevenlabs@gmail.com",
+            to : "corevenlabs@gmail.com",
+            text :  `
+            Nombre: ${nombre}
+            Email: ${email}
+            Mensaje: ${mensaje}
+        `
+        };
+
+        await transporter.sendMail(mailOptions)
+
+        res.status(200).json({
+            message : "Correo enviado exitosamente"
+        })
+        
+    } catch (error) {
+        next(error)
     }
-});
+}
 
-module.exports = transporter;
+module.exports = sendEmail
