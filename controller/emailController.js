@@ -1,14 +1,13 @@
-
-const transporter = require("../config/mailer")
-
+const resend = require("../config/mailer") // Ahora importa Resend en lugar de Nodemailer
 
 const sendEmail = async (req, res, next) => {
     try {
 
         const {nombre, email, mensaje} = req.body
 
+        // Cambiamos 'from' a 'onboarding@resend.dev' porque Resend gratis exige ese remitente para pruebas
         const mailOptions = {
-            from : "corevenlabs@gmail.com",
+            from : "onboarding@resend.dev", 
             to : "corevenlabs@gmail.com",
             text :  `
             Nombre: ${nombre}
@@ -17,7 +16,8 @@ const sendEmail = async (req, res, next) => {
         `
         };
 
-        await transporter.sendMail(mailOptions)
+        // Aquí cambiamos .sendMail(mailOptions) de Nodemailer por .emails.send(mailOptions) de Resend
+        await resend.emails.send(mailOptions)
 
         res.status(200).json({
             message : "Correo enviado exitosamente"
